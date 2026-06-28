@@ -1,6 +1,7 @@
 const std = @import("std");
 const gtk = @import("gtk.zig");
 const tabs = @import("tabs.zig");
+const recent = @import("recent.zig");
 
 const cc = gtk.cc;
 
@@ -59,6 +60,11 @@ fn doSave() void {
     }
 }
 
+fn doRecent() void {
+    const btn = recent.menu_button orelse return;
+    gtk.gtk_menu_button_popup(btn);
+}
+
 // ── GTK signal callbacks ────────────────────────────────────────────────────
 
 fn activateCb(app: *gtk.GtkApplication, _: ?*anyopaque) callconv(cc) void {
@@ -74,8 +80,28 @@ fn activateCb(app: *gtk.GtkApplication, _: ?*anyopaque) callconv(cc) void {
     const btn_open = gtk.gtk_button_new_with_label("Open");
     const btn_save = gtk.gtk_button_new_with_label("Save");
 
+    // Recent files menu button with popover
+    const btn_recent = gtk.gtk_menu_button_new();
+    gtk.gtk_menu_button_set_label(btn_recent, "Recent");
+    recent.menu_button = btn_recent;
+
+    const popover = gtk.gtk_popover_new();
+    const popover_scrolled = gtk.gtk_scrolled_window_new();
+    gtk.gtk_widget_set_size_request(popover_scrolled, 280, 300);
+    gtk.gtk_scrolled_window_set_policy(popover_scrolled, gtk.GTK_POLICY_NEVER, gtk.GTK_POLICY_AUTOMATIC);
+
+    const popover_box = gtk.gtk_box_new(gtk.GTK_ORIENTATION_VERTICAL, 2);
+    recent.popover_box = popover_box;
+    gtk.gtk_scrolled_window_set_child(popover_scrolled, popover_box);
+    gtk.gtk_popover_set_child(popover, popover_scrolled);
+    gtk.gtk_menu_button_set_popover(btn_recent, popover);
+
+    recent.load();
+    recent.rebuildPopover();
+
     gtk.gtk_header_bar_pack_start(header, btn_new);
     gtk.gtk_header_bar_pack_start(header, btn_open);
+    gtk.gtk_header_bar_pack_start(header, btn_recent);
     gtk.gtk_header_bar_pack_end(header, btn_save);
 
     _ = gtk.g_signal_connect_data(@ptrCast(btn_new), "clicked", @ptrCast(&newClickedCb), null, null, 0);
@@ -167,6 +193,10 @@ fn keyPressedCb(
             },
             gtk.GDK_KEY_n => {
                 doNew();
+                return 1;
+            },
+            gtk.GDK_KEY_r => {
+                doRecent();
                 return 1;
             },
             gtk.GDK_KEY_w => {

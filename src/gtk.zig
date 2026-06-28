@@ -59,6 +59,8 @@ pub extern fn g_signal_connect_data(
 pub extern fn g_free(ptr: ?*anyopaque) void;
 pub extern fn g_error_free(err: *GError) void;
 pub extern fn g_strdup(str: [*:0]const u8) ?[*:0]u8;
+pub extern fn g_get_home_dir() [*:0]const u8;
+pub extern fn g_mkdir_with_parents(pathname: [*:0]const u8, mode: c_uint) c_int;
 
 // ── GFile ───────────────────────────────────────────────────────────────────
 
@@ -192,13 +194,37 @@ pub extern fn gtk_label_set_text(label: *GtkWidget, text: [*:0]const u8) void;
 pub extern fn gtk_box_new(orientation: c_int, spacing: c_int) *GtkWidget;
 pub extern fn gtk_box_append(box: *GtkWidget, child: *GtkWidget) void;
 
+// ── GtkMenuButton ───────────────────────────────────────────────────────────
+
+pub extern fn gtk_menu_button_new() *GtkWidget;
+pub extern fn gtk_menu_button_set_popover(button: *GtkWidget, popover: ?*GtkWidget) void;
+pub extern fn gtk_menu_button_set_label(button: *GtkWidget, label: [*:0]const u8) void;
+pub extern fn gtk_menu_button_popup(button: *GtkWidget) void;
+
+// ── GtkPopover ──────────────────────────────────────────────────────────────
+
+pub extern fn gtk_popover_new() *GtkWidget;
+pub extern fn gtk_popover_set_child(popover: *GtkWidget, child: ?*GtkWidget) void;
+
+// ── Additional widget helpers ───────────────────────────────────────────────
+
+pub extern fn gtk_widget_set_size_request(widget: *GtkWidget, width: c_int, height: c_int) void;
+pub extern fn gtk_scrolled_window_set_policy(sw: *GtkWidget, h: c_int, v: c_int) void;
+pub extern fn gtk_widget_get_first_child(widget: *GtkWidget) ?*GtkWidget;
+pub extern fn gtk_widget_get_next_sibling(widget: *GtkWidget) ?*GtkWidget;
+pub extern fn gtk_box_remove(box: *GtkWidget, child: *GtkWidget) void;
+
 // ── Constants ───────────────────────────────────────────────────────────────
 
 pub const GTK_WRAP_WORD_CHAR: c_int = 3;
 pub const GTK_ORIENTATION_HORIZONTAL: c_int = 0;
+pub const GTK_ORIENTATION_VERTICAL: c_int = 1;
+pub const GTK_POLICY_NEVER: c_int = 0;
+pub const GTK_POLICY_AUTOMATIC: c_int = 1;
 pub const GDK_KEY_s: c_uint = 0x73;
 pub const GDK_KEY_o: c_uint = 0x6f;
 pub const GDK_KEY_n: c_uint = 0x6e;
+pub const GDK_KEY_r: c_uint = 0x72;
 pub const GDK_KEY_w: c_uint = 0x77;
 pub const GDK_KEY_Tab: c_uint = 0xff09;
 pub const GDK_KEY_ISO_Left_Tab: c_uint = 0xfe20;

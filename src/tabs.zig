@@ -1,5 +1,6 @@
 const std = @import("std");
 const gtk = @import("gtk.zig");
+const recent = @import("recent.zig");
 
 const cc = gtk.cc;
 const GtkWidget = gtk.GtkWidget;
@@ -104,6 +105,7 @@ pub fn loadFileIntoTab(tab: *TabInfo, path: [*:0]const u8) void {
         tab.file_path = gtk.g_strdup(path);
         updateTabLabel(tab);
         updateTitle();
+        recent.addPath(path);
     } else {
         if (err) |e| gtk.g_error_free(e);
     }
@@ -129,6 +131,7 @@ pub fn saveToFile(path: [*:0]const u8) void {
         tab.file_path = gtk.g_strdup(path);
         updateTabLabel(tab);
         updateTitle();
+        recent.addPath(path);
     } else {
         if (err) |e| gtk.g_error_free(e);
     }
