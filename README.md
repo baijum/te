@@ -35,11 +35,14 @@ zig build
 
 ## Keyboard Shortcuts
 
-| Shortcut | Action         |
-|----------|----------------|
-| Ctrl+N   | New file       |
-| Ctrl+O   | Open file      |
-| Ctrl+S   | Save file      |
+| Shortcut         | Action             |
+|------------------|--------------------|
+| Ctrl+N           | New tab            |
+| Ctrl+O           | Open file (new tab)|
+| Ctrl+S           | Save file          |
+| Ctrl+W           | Close current tab  |
+| Ctrl+Tab         | Next tab           |
+| Ctrl+Shift+Tab   | Previous tab       |
 
 ## Architecture
 
