@@ -4,6 +4,40 @@ const tabs = @import("tabs.zig");
 
 const cc = gtk.cc;
 
+// ── Font size state ─────────────────────────────────────────────────────────
+
+const DEFAULT_FONT_SIZE: u8 = 12;
+const MIN_FONT_SIZE: u8 = 6;
+const MAX_FONT_SIZE: u8 = 72;
+var font_size: u8 = DEFAULT_FONT_SIZE;
+var css_provider: ?*gtk.GtkCssProvider = null;
+
+fn applyFontSize() void {
+    const provider = css_provider orelse return;
+    var buf: [64]u8 = undefined;
+    const css = std.fmt.bufPrint(&buf, "textview {{ font-size: {d}pt; }}\x00", .{font_size}) catch return;
+    gtk.gtk_css_provider_load_from_string(provider, @ptrCast(css.ptr));
+}
+
+fn doZoomIn() void {
+    if (font_size < MAX_FONT_SIZE) {
+        font_size += 1;
+        applyFontSize();
+    }
+}
+
+fn doZoomOut() void {
+    if (font_size > MIN_FONT_SIZE) {
+        font_size -= 1;
+        applyFontSize();
+    }
+}
+
+fn doZoomReset() void {
+    font_size = DEFAULT_FONT_SIZE;
+    applyFontSize();
+}
+
 // ── Actions ─────────────────────────────────────────────────────────────────
 
 fn doNew() void {
@@ -62,6 +96,12 @@ fn activateCb(app: *gtk.GtkApplication, _: ?*anyopaque) callconv(cc) void {
     const key_ctrl = gtk.gtk_event_controller_key_new();
     _ = gtk.g_signal_connect_data(key_ctrl, "key-pressed", @ptrCast(&keyPressedCb), null, null, 0);
     gtk.gtk_widget_add_controller(win, key_ctrl);
+
+    css_provider = gtk.gtk_css_provider_new();
+    if (gtk.gdk_display_get_default()) |display| {
+        gtk.gtk_style_context_add_provider_for_display(display, @ptrCast(css_provider.?), gtk.GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+    }
+    applyFontSize();
 
     gtk.gtk_window_present(win);
 }
@@ -139,6 +179,18 @@ fn keyPressedCb(
             },
             gtk.GDK_KEY_ISO_Left_Tab => {
                 tabs.switchToPrevTab();
+                return 1;
+            },
+            gtk.GDK_KEY_equal, gtk.GDK_KEY_plus => {
+                doZoomIn();
+                return 1;
+            },
+            gtk.GDK_KEY_minus => {
+                doZoomOut();
+                return 1;
+            },
+            gtk.GDK_KEY_0 => {
+                doZoomReset();
                 return 1;
             },
             else => {},

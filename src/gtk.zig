@@ -11,6 +11,8 @@ pub const GtkFileDialog = opaque {};
 pub const GFile = opaque {};
 pub const GAsyncResult = opaque {};
 pub const GCancellable = opaque {};
+pub const GtkCssProvider = opaque {};
+pub const GdkDisplay = opaque {};
 
 // ── Struct types ────────────────────────────────────────────────────────────
 
@@ -122,6 +124,17 @@ pub extern fn gtk_text_buffer_set_modified(buf: *GtkTextBuffer, modified: c_int)
 pub extern fn gtk_scrolled_window_new() *GtkWidget;
 pub extern fn gtk_scrolled_window_set_child(sw: *GtkWidget, child: *GtkWidget) void;
 
+// ── GtkCssProvider ──────────────────────────────────────────────────────────
+
+pub extern fn gtk_css_provider_new() *GtkCssProvider;
+pub extern fn gtk_css_provider_load_from_string(provider: *GtkCssProvider, string: [*:0]const u8) void;
+pub extern fn gdk_display_get_default() ?*GdkDisplay;
+pub extern fn gtk_style_context_add_provider_for_display(
+    display: *GdkDisplay,
+    provider: *anyopaque,
+    priority: c_uint,
+) void;
+
 // ── GtkWidget helpers ───────────────────────────────────────────────────────
 
 pub extern fn gtk_widget_set_vexpand(w: *GtkWidget, expand: c_int) void;
@@ -189,5 +202,10 @@ pub const GDK_KEY_n: c_uint = 0x6e;
 pub const GDK_KEY_w: c_uint = 0x77;
 pub const GDK_KEY_Tab: c_uint = 0xff09;
 pub const GDK_KEY_ISO_Left_Tab: c_uint = 0xfe20;
+pub const GDK_KEY_equal: c_uint = 0x3d;
+pub const GDK_KEY_minus: c_uint = 0x2d;
+pub const GDK_KEY_plus: c_uint = 0x2b;
+pub const GDK_KEY_0: c_uint = 0x30;
 pub const GDK_CONTROL_MASK: c_uint = 4;
 pub const GDK_SHIFT_MASK: c_uint = 1;
+pub const GTK_STYLE_PROVIDER_PRIORITY_APPLICATION: c_uint = 600;
